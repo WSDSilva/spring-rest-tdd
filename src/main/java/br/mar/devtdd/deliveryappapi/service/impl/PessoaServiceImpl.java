@@ -31,7 +31,7 @@ public class PessoaServiceImpl implements PessoaService {
 		String numero = pessoa.getTelefones().get(0).getNumero();
 		
 		if(optional.isPresent()) {
-			throw new UnicidadeCpfException();
+			throw new UnicidadeCpfException("Já existe uma pessoa cadastrada com com CPF '"+pessoa.getCpf()+"'");
 		} 		
 		
 		optional = pessoaRepository.findByTelefoneDddAndNumero(ddd, numero);

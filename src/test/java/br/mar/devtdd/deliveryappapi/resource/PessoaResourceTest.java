@@ -76,10 +76,37 @@ public class PessoaResourceTest extends DeliveryAppApiApplicationTests{
 			.header("Location", equalTo("http://localhost:"+porta+"/pessoas/55/2728257995"))
 			.body("nome", equalTo("Isaac Luiz"),
 					"cpf", equalTo("22284431070"));
-			
+	}
+	
+	@Test
+	public void nao_deve_salvar_duas_pessoas_com_o_mesmo_cpf() throws Exception {
+		final Pessoa pessoa  = new Pessoa();
 		
-				
-				
+		pessoa.setNome("Isaac Luiz");
+		pessoa.setCpf("72788740417");
+		
+		final Telefone telefone = new Telefone();
+		telefone.setDdd("55");
+		telefone.setNumero("2728257995");
+		
+		List<Telefone> telefones = new ArrayList<Telefone>();
+		telefones.add(telefone);
+		
+		pessoa.setTelefones(telefones);	
+		
+		RestAssured.given()
+			.request()
+			.header("Accept", ContentType.ANY)
+			.header("Content-type", ContentType.JSON)
+			.body(pessoa)
+		.when()
+		.post("/pessoas")
+		.then()
+				.log().body()
+			.and()
+				.statusCode(HttpStatus.BAD_REQUEST.value())
+				.body("erro", equalTo("Já existe uma pessoa cadastrada com com CPF '72788740417'"));
+		
 	}
 	
 	

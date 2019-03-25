@@ -62,6 +62,11 @@ public class PessoaResource {
 		return new ResponseEntity<>(pessoaSalva, HttpStatus.CREATED);
 	}
 	
+	@ExceptionHandler({ UnicidadeCpfException.class })
+	public ResponseEntity<Erro> handleUnicidadeCpfException(UnicidadeCpfException ex){
+		return new ResponseEntity(new Erro(ex.getMessage()), HttpStatus.BAD_REQUEST);
+	}
+	
 	
 	class Erro{
 		String erro;

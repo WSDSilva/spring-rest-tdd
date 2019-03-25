@@ -78,12 +78,17 @@ public class PessoaServiceTest {
 	public void nao_deve_salvar_duas_pessoas_com_mesmo_cpf() throws Exception{
 		when(pessoaRepository.findByCpf(CPF)).thenReturn(Optional.of(pessoa));
 		
+		expectedExcepiton.expect(UnicidadeCpfException.class);
+		expectedExcepiton.expectMessage("Já existe uma pessoa cadastrada com com CPF '"+CPF+"'");
+		
 		sut.salvar(pessoa);
 	}
 	
 	@Test(expected = UnicidadeTelefoneException.class)
 	public void nao_deve_salvar_duas_pessoas_com_mesmo_telefone() throws Exception{
 		when(pessoaRepository.findByTelefoneDddAndNumero(DDD,TELEFONE)).thenReturn(Optional.of(pessoa));
+		
+		
 		
 		sut.salvar(pessoa);
 	}
