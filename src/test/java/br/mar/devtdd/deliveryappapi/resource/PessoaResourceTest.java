@@ -1,20 +1,22 @@
 package br.mar.devtdd.deliveryappapi.resource;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.assertj.core.util.Arrays;
-import org.hibernate.mapping.Array;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
 import br.mar.devtdd.deliveryappapi.DeliveryAppApiApplicationTests;
 import br.mar.devtdd.deliveryappapi.model.Pessoa;
 import br.mar.devtdd.deliveryappapi.model.Telefone;
+import br.mar.devtdd.deliveryappapi.repository.filtro.PessoaFiltro;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+
+
 public class PessoaResourceTest extends DeliveryAppApiApplicationTests{
 	
 	@Test
@@ -106,6 +108,30 @@ public class PessoaResourceTest extends DeliveryAppApiApplicationTests{
 			.and()
 				.statusCode(HttpStatus.BAD_REQUEST.value())
 				.body("erro", equalTo("Já existe uma pessoa cadastrada com com CPF '72788740417'"));
+		
+	}
+	
+	@Test
+	public void deve_filtrar_pessoa_pelo_nome() throws Exception {
+		final PessoaFiltro filtro = new PessoaFiltro();
+		filtro.setNome("a");
+		
+		RestAssured.given()
+			.request()
+			.header("Accept", ContentType.ANY)
+			.header("Content-type", ContentType.JSON)
+			.body(filtro)
+		.when()
+		.post("/pessoas/filtrar")
+		.then()
+			.log().body()
+		.and()
+			.statusCode(HttpStatus.OK.value())
+			.body("codigo",  containsInAnyOrder(1, 3, 5),
+					"nome", containsInAnyOrder("Thiago", "Iago", "Cauê"),
+					"cpf", containsInAnyOrder("86730543540", "38767897100", "72788740417"));
+		
+		
 		
 	}
 	

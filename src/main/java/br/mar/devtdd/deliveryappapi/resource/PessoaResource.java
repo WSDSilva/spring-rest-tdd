@@ -1,6 +1,7 @@
 package br.mar.devtdd.deliveryappapi.resource;
 
 import java.net.URI;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,6 +19,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.mar.devtdd.deliveryappapi.model.Pessoa;
 import br.mar.devtdd.deliveryappapi.model.Telefone;
+import br.mar.devtdd.deliveryappapi.repository.PessoaRepositoryImpl;
+import br.mar.devtdd.deliveryappapi.repository.filtro.PessoaFiltro;
 import br.mar.devtdd.deliveryappapi.service.PessoaService;
 import br.mar.devtdd.deliveryappapi.service.exception.TelefoneNaoEncontradoException;
 import br.mar.devtdd.deliveryappapi.service.exception.UnicidadeCpfException;
@@ -29,6 +32,9 @@ public class PessoaResource {
 	
 	@Autowired
 	PessoaService pessoaservice;
+	
+	@Autowired
+	PessoaRepositoryImpl pessoaRepository;
 	
 	@GetMapping("/{ddd}/{numero}")
 	public ResponseEntity<Pessoa> buscarPorDddENumero(@PathVariable String ddd, 
@@ -60,6 +66,13 @@ public class PessoaResource {
 		response.setHeader("Location", uri.toASCIIString());
 		
 		return new ResponseEntity<>(pessoaSalva, HttpStatus.CREATED);
+	}
+	
+	@PostMapping("/filtrar")
+	public ResponseEntity<List<Pessoa>> listar(@RequestBody PessoaFiltro filtro){
+		List<Pessoa> pessoas = pessoaRepository.filtrar(filtro);
+		
+		return new ResponseEntity<>(pessoas, HttpStatus.OK);
 	}
 	
 	@ExceptionHandler({ UnicidadeCpfException.class })
